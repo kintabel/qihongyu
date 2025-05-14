@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>学生列表</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+  <h2>学生信息管理</h2>
+  <a th:href="@{/student/add}" class="btn btn-primary mb-3">添加学生</a>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>学号</th>
+      <th>姓名</th>
+      <th>年龄</th>
+      <th>地址</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="student : ${students}">
+      <td th:text="${student.id}"></td>
+      <td th:text="${student.name}"></td>
+      <td th:text="${student.age}"></td>
+      <td th:text="${student.address}"></td>
+      <td>
+        <a th:href="@{/student/edit/{id}(id=${student.id})}" class="btn btn-sm btn-warning">编辑</a>
+        <form th:action="@{/student/delete/{id}(id=${student.id})}" method="post" style="display: inline;">
+          <input type="hidden" name="_method" value="delete"/>
+          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除吗？')">删除</button>
+        </form>
+      </td>
+    </tr>
+    <!-- 空列表提示 -->
+    <tr th:if="${students == null or students.isEmpty()}">
+      <td colspan="5" class="text-center text-muted">没有找到学生数据</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- 分页导航 -->
+  <nav th:if="${pageInfo != null && pageInfo.pages > 1}">
+    <ul class="pagination">
+      <li class="page-item" th:classappend="${pageInfo.isFirstPage} ? 'disabled'">
+        <a class="page-link" th:href="@{/student/list(page=1)}">首页</a>
+      </li>
+      <li class="page-item" th:classappend="${pageInfo.hasPreviousPage} ? '' : 'disabled'">
+        <a class="page-link" th:href="@{/student/list(page=${pageInfo.prePage})}">上一页</a>
+      </li>
+      <!-- 生成中间的页码 -->
+      <li class="page-item" th:each="navPage : ${pageInfo.navigatepageNums}"
+          th:classappend="${navPage == pageInfo.pageNum} ? 'active'">
+        <a class="page-link" th:href="@{/student/list(page=${navPage})}" th:text="${navPage}"></a>
+      </li>
+      <li class="page-item" th:classappend="${pageInfo.hasNextPage} ? '' : 'disabled'">
+        <a class="page-link" th:href="@{/student/list(page=${pageInfo.nextPage})}">下一页</a>
+      </li>
+      <li class="page-item" th:classappend="${pageInfo.isLastPage} ? 'disabled'">
+        <a class="page-link" th:href="@{/student/list(page=${pageInfo.pages})}">末页</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- 分页信息 -->
+  <div class="mt-2 text-muted" th:if="${pageInfo != null}">
+    当前第[[${pageInfo.pageNum}]]页，共[[${pageInfo.pages}]]页，总共[[${pageInfo.total}]]条记录
+  </div>
+</div>
+</body>
+</html>
